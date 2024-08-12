@@ -1,0 +1,48 @@
+version: "1"
+
+package:
+  id: io.github.qsynth
+  name: qsynth
+  version: 1.0.1.0
+  kind: app
+  description: |
+    Qsynth - A fluidsynth Qt GUI Interface
+
+base: org.deepin.foundation/23.0.0
+runtime: org.deepin.Runtime/23.0.1
+
+command:
+  - /opt/apps/io.github.qsynth/files/bin/qsynth
+
+sources:
+  - kind: git
+    url: https://github.com/rncbc/qsynth.git
+    version: master
+    commit: 03226c7dd057016c3548f80e998e804e728309ef
+
+  - kind: git
+    url: https://github.com/FluidSynth/fluidsynth.git
+    version: master
+    commit: 2e60f94a2d27acf39768011dda64a8762a05f9ee
+
+  - kind: file
+    url: https://community-packages.deepin.com/beige/pool/main/a/alsa-utils/alsa-utils_1.2.11-1_amd64.deb
+    digest: e503c59b1e64f867fa1844e71648c34c5a6c663878011daaa392dafa942cfef1
+
+build: |
+  echo "" > $PREFIX/packages.list
+  bash ./install_dep linglong/sources "$PREFIX"
+  cd /project/linglong/sources/fluidsynth.git/
+  cmake -Bbuild \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX} 
+    
+  cmake --build build -j$(nproc --all)
+  cmake --build build --target install
+  
+  cd /project/linglong/sources/qsynth.git/
+  cmake -Bbuild \
+        -DCMAKE_INSTALL_PREFIX=${PREFIX} \
+  
+    
+  cmake --build build -j$(nproc --all)
+  cmake --build build --target install
